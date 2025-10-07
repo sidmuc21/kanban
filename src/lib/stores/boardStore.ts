@@ -1,5 +1,6 @@
 import { writable, derived } from "svelte/store";
 
+// Define Issue type here
 export interface Issue {
   id: string;
   title: string;
@@ -14,21 +15,31 @@ interface BoardData {
   [lane: string]: Issue[];
 }
 
-const initialData: BoardData = {
+const defaultData: BoardData = {
   "To Do": [],
   "Doing": [],
   "Done": [],
   "Archive": []
 };
 
+// Initialize from localStorage only in browser
+let initialData: BoardData = defaultData;
+if (typeof localStorage !== "undefined") {
+  const stored = localStorage.getItem("kanbanData");
+  if (stored) initialData = JSON.parse(stored);
+}
+
+// Writable store
 export const board = writable<BoardData>(initialData);
 
-// Persist automatically
-board.subscribe(value => {
-  localStorage.setItem("kanbanData", JSON.stringify(value));
-});
+// Persist changes in localStorage (browser only)
+if (typeof localStorage !== "undefined") {
+  board.subscribe(value => {
+    localStorage.setItem("kanbanData", JSON.stringify(value));
+  });
+}
 
-// Sum of story points per lane
+// Derived store: sum of story points per lane
 export const storyPointsSum = derived(board, $board => {
   const sums: Record<string, number> = {};
   for (const lane in $board) {
