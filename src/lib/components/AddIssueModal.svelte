@@ -7,63 +7,50 @@
   let dueDate = "";
   let storyPoints = 1;
   let priority: "Low" | "Medium" | "High" = "Medium";
-  let lane = "To Do";
 
-  const lanes = ["To Do", "Doing", "Done", "Archive"];
+  // Simple ID generator
+  const generateId = () => Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
 
-  const addIssue = (e: Event) => {
-    e.preventDefault();
-    const newIssue = {
-      id: crypto.randomUUID(),
-      title,
-      description,
-      creationDate: new Date().toISOString(),
-      dueDate,
-      storyPoints: Number(storyPoints),
-      priority
-    };
-    board.update(b => ({ ...b, [lane]: [...b[lane], newIssue] }));
-    // clear & close
-    title = ""; description = ""; dueDate = ""; storyPoints = 1; priority = "Medium"; lane = "To Do";
+  const addIssue = () => {
+    if (!title) return;
+
+    board.update(b => {
+      b["To Do"].push({
+        id: generateId(),
+        title,
+        description,
+        creationDate: new Date().toISOString(),
+        dueDate,
+        storyPoints,
+        priority
+      });
+      return b;
+    });
+
+    // Reset form
+    title = description = "";
+    dueDate = "";
+    storyPoints = 1;
+    priority = "Medium";
     open = false;
   };
 </script>
 
-{#if open}
-  <div class="fixed inset-0 z-50 flex items-center justify-center">
-    <!-- backdrop -->
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div class="absolute inset-0 bg-black/50" on:click={() => open = false}></div>
-
-    <!-- modal card -->
-    <div class="relative bg-white rounded-2xl shadow-xl p-6 sm:p-8 w-full max-w-md mx-4 font-lex">
-      <h3 class="text-xl font-semibold mb-4 text-center text-gray-800">Add New Issue</h3>
-
-      <form on:submit={addIssue} class="space-y-3">
-        <input class="w-full border border-gray-300 rounded-xl p-3" bind:value={title} required placeholder="Title" />
-        <!-- svelte-ignore element_invalid_self_closing_tag -->
-        <textarea class="w-full border border-gray-300 rounded-xl p-3" bind:value={description} placeholder="Description" />
-        <input class="w-full border border-gray-300 rounded-xl p-3" type="date" bind:value={dueDate} required />
-
-        <div class="flex gap-2">
-          <input class="flex-1 border border-gray-300 rounded-xl p-3" type="number" min="0" bind:value={storyPoints} placeholder="Story Points" />
-          <select class="flex-1 border border-gray-300 rounded-xl p-3" bind:value={priority}>
-            <option>Low</option>
-            <option selected>Medium</option>
-            <option>High</option>
-          </select>
-        </div>
-
-        <select class="w-full border border-gray-300 rounded-xl p-3" bind:value={lane}>
-          {#each lanes as l}<option>{l}</option>{/each}
-        </select>
-
-        <div class="flex justify-end gap-3 mt-4">
-          <button type="button" on:click={() => open = false} class="px-4 py-2 rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200">Cancel</button>
-          <button type="submit" class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700">Add</button>
-        </div>
-      </form>
+<dialog class="p-4 flex flex-col gap-2 w-80" open={open}>
+  <form method="dialog" class="flex flex-col gap-2">
+    <h3 class="font-semibold text-lg">New Issue</h3>
+    <input type="text" placeholder="Title" bind:value={title} required class="border p-1 rounded"/>
+    <textarea placeholder="Description" bind:value={description} class="border p-1 rounded"/>
+    <input type="date" bind:value={dueDate} class="border p-1 rounded"/>
+    <input type="number" min="1" bind:value={storyPoints} class="border p-1 rounded"/>
+    <select bind:value={priority} class="border p-1 rounded">
+      <option>Low</option>
+      <option selected>Medium</option>
+      <option>High</option>
+    </select>
+    <div class="flex justify-end gap-2 mt-2">
+      <button type="button" on:click={() => open = false}>Cancel</button>
+      <button type="button" on:click={addIssue} class="bg-indigo-700 text-white px-2 rounded">Add</button>
     </div>
-  </div>
-{/if}
+  </form>
+</dialog>

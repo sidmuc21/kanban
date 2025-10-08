@@ -1,46 +1,56 @@
-import { writable, derived } from "svelte/store";
+import { writable } from "svelte/store";
 
-/** Issue type */
-export interface Issue {
+export type Issue = {
   id: string;
   title: string;
-  description?: string;
-  creationDate: string;
-  dueDate: string;
+  description: string;
+  creationDate: string; // ISO string
+  dueDate: string;      // ISO string
   storyPoints: number;
   priority: "Low" | "Medium" | "High";
-}
-
-/** Board data: lanes with issues */
-type BoardData = Record<string, Issue[]>;
-
-const DEFAULT_BOARD: BoardData = {
-  "To Do": [],
-  "Doing": [],
-  "Done": [],
-  "Archive": []
 };
 
-// SSR-safe initialization
-let initialBoard: BoardData = DEFAULT_BOARD;
-if (typeof window !== "undefined" && localStorage.getItem("kanbanData")) {
-  try {
-    initialBoard = JSON.parse(localStorage.getItem("kanbanData")!);
-  } catch {}
+export type Board = {
+  "To Do": Issue[];
+  "Doing": Issue[];
+  "Done": Issue[];
+  "Archive": Issue[];
+};
+
+const LOCAL_STORAGE_KEY = "kanban-board";
+
+function createBoardStore() {
+  const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
+  const initial: Board = stored
+    ? JSON.parse(stored)
+    : { "To Do": [], "Doing": [], "Done": [], "Archive": [] };
+
+  const { subscribe, set, update } = writable(initial);
+
+  return {
+    subscribe,
+    set: (b: Board) => {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(b));
+      set(b);
+    },
+    update: (fn: (b: Board) => Board) => {
+      update(b => {
+        const newBoard = fn(b);
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newBoard));
+        return newBoard;
+      });
+    }
+  };
 }
 
-export const board = writable<BoardData>(initialBoard);
+export const board = createBoardStore();
 
-// Persist changes
-if (typeof window !== "undefined") {
-  board.subscribe((b) => localStorage.setItem("kanbanData", JSON.stringify(b)));
-}
-
-// Sum of story points per lane
-export const storyPointsSum = derived(board, ($board) => {
+// Derived store to calculate story points per lane
+import { derived } from "svelte/store";
+export const storyPointsSum = derived(board, $board => {
   const sums: Record<string, number> = {};
   for (const lane in $board) {
-    sums[lane] = $board[lane].reduce((acc, i) => acc + (i.storyPoints || 0), 0);
+    sums[lane] = $board[lane].reduce((acc, issue) => acc + issue.storyPoints, 0);
   }
   return sums;
 });
