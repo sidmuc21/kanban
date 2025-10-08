@@ -1,6 +1,6 @@
 import { writable, derived } from "svelte/store";
 
-// Define Issue type here
+/** Issue type */
 export interface Issue {
   id: string;
   title: string;
@@ -11,39 +11,36 @@ export interface Issue {
   priority: "Low" | "Medium" | "High";
 }
 
-interface BoardData {
-  [lane: string]: Issue[];
-}
+/** Board data: lanes with issues */
+type BoardData = Record<string, Issue[]>;
 
-const defaultData: BoardData = {
+const DEFAULT_BOARD: BoardData = {
   "To Do": [],
   "Doing": [],
   "Done": [],
   "Archive": []
 };
 
-// Initialize from localStorage only in browser
-let initialData: BoardData = defaultData;
-if (typeof localStorage !== "undefined") {
-  const stored = localStorage.getItem("kanbanData");
-  if (stored) initialData = JSON.parse(stored);
+// SSR-safe initialization
+let initialBoard: BoardData = DEFAULT_BOARD;
+if (typeof window !== "undefined" && localStorage.getItem("kanbanData")) {
+  try {
+    initialBoard = JSON.parse(localStorage.getItem("kanbanData")!);
+  } catch {}
 }
 
-// Writable store
-export const board = writable<BoardData>(initialData);
+export const board = writable<BoardData>(initialBoard);
 
-// Persist changes in localStorage (browser only)
-if (typeof localStorage !== "undefined") {
-  board.subscribe(value => {
-    localStorage.setItem("kanbanData", JSON.stringify(value));
-  });
+// Persist changes
+if (typeof window !== "undefined") {
+  board.subscribe((b) => localStorage.setItem("kanbanData", JSON.stringify(b)));
 }
 
-// Derived store: sum of story points per lane
-export const storyPointsSum = derived(board, $board => {
+// Sum of story points per lane
+export const storyPointsSum = derived(board, ($board) => {
   const sums: Record<string, number> = {};
   for (const lane in $board) {
-    sums[lane] = $board[lane].reduce((acc, issue) => acc + issue.storyPoints, 0);
+    sums[lane] = $board[lane].reduce((acc, i) => acc + (i.storyPoints || 0), 0);
   }
   return sums;
 });
