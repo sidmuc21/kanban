@@ -5,6 +5,25 @@
 
   let modalOpen = false;
   const lanes = ["To Do", "Doing", "Done", "Archive"];
+
+  const handleDrop = (e: DragEvent, toLane: string) => {
+    e.preventDefault();
+    const data = e.dataTransfer?.getData("text/plain");
+    if (!data) return;
+
+    const { id, fromLane } = JSON.parse(data);
+    if (fromLane === toLane) return;
+
+    board.update(b => {
+      const itemIndex = b[fromLane].findIndex(i => i.id === id);
+      if (itemIndex === -1) return b;
+      const [moved] = b[fromLane].splice(itemIndex, 1);
+      b[toLane].push(moved);
+      return { ...b };
+    });
+  };
+
+  const handleDragOver = (e: DragEvent) => e.preventDefault();
 </script>
 
 <header class="flex justify-between items-center p-6">
@@ -20,7 +39,12 @@
 
 <main class="min-h-[70vh] bg-indigo-900 p-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
   {#each lanes as lane}
-    <section class="flex flex-col bg-white rounded-2xl shadow-sm overflow-hidden">
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <section
+      class="flex flex-col bg-white rounded-2xl shadow-sm overflow-hidden"
+      on:drop={(e) => handleDrop(e, lane)}
+      on:dragover={handleDragOver}
+    >
       <header class="bg-indigo-100 text-center py-3 font-lex font-semibold border-b border-gray-200">
         {lane} ({$storyPointsSum[lane] ?? 0} SP)
       </header>
@@ -29,7 +53,7 @@
           <div class="text-gray-400 text-sm text-center">No issues yet</div>
         {:else}
           {#each $board[lane] as issue (issue.id)}
-            <IssueCard {issue} />
+            <IssueCard {issue} lane={lane} />
           {/each}
         {/if}
       </div>
