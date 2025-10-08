@@ -1,11 +1,11 @@
-import { writable } from "svelte/store";
+import { writable, derived } from "svelte/store";
 
 export type Issue = {
   id: string;
   title: string;
   description: string;
-  creationDate: string; // ISO string
-  dueDate: string;      // ISO string
+  creationDate: string;
+  dueDate: string;
   storyPoints: number;
   priority: "Low" | "Medium" | "High";
 };
@@ -20,23 +20,29 @@ export type Board = {
 const LOCAL_STORAGE_KEY = "kanban-board";
 
 function createBoardStore() {
-  const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
-  const initial: Board = stored
-    ? JSON.parse(stored)
-    : { "To Do": [], "Doing": [], "Done": [], "Archive": [] };
+  let initial: Board = { "To Do": [], "Doing": [], "Done": [], "Archive": [] };
+
+  if (typeof localStorage !== "undefined") {
+    const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (stored) initial = JSON.parse(stored);
+  }
 
   const { subscribe, set, update } = writable(initial);
 
   return {
     subscribe,
     set: (b: Board) => {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(b));
+      if (typeof localStorage !== "undefined") {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(b));
+      }
       set(b);
     },
     update: (fn: (b: Board) => Board) => {
       update(b => {
         const newBoard = fn(b);
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newBoard));
+        if (typeof localStorage !== "undefined") {
+          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newBoard));
+        }
         return newBoard;
       });
     }
@@ -45,8 +51,6 @@ function createBoardStore() {
 
 export const board = createBoardStore();
 
-// Derived store to calculate story points per lane
-import { derived } from "svelte/store";
 export const storyPointsSum = derived(board, $board => {
   const sums: Record<string, number> = {};
   for (const lane in $board) {

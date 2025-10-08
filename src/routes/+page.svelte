@@ -11,13 +11,15 @@
     const data = e.dataTransfer?.getData("text/plain");
     if (!data) return;
 
-    const { id, fromLane } = JSON.parse(data);
+    let parsed;
+    try { parsed = JSON.parse(data); } catch { return; }
+    const { id, fromLane } = parsed;
     if (fromLane === toLane) return;
 
     board.update(b => {
-      const itemIndex = b[fromLane].findIndex(i => i.id === id);
-      if (itemIndex === -1) return b;
-      const [moved] = b[fromLane].splice(itemIndex, 1);
+      const idx = b[fromLane].findIndex(i => i.id === id);
+      if (idx === -1) return b;
+      const [moved] = b[fromLane].splice(idx, 1);
       b[toLane].push(moved);
       return { ...b };
     });
