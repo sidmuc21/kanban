@@ -35,12 +35,6 @@ Each issue has the following properties:
 
 ---
 
-## Screenshots
-
-> *(Add screenshots here showing the Kanban board, modal form, drag & drop, etc.)*
-
----
-
 ## Getting Started
 
 ### Prerequisites
