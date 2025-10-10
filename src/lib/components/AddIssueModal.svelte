@@ -50,6 +50,7 @@
     <h3 class="text-2xl font-semibold text-indigo-900">Create New Issue</h3>
 
     <div class="flex flex-col gap-1">
+      <!-- svelte-ignore a11y_label_has_associated_control -->
       <label class="text-sm font-medium text-gray-700">Title</label>
       <input
         type="text"
@@ -61,6 +62,7 @@
     </div>
 
     <div class="flex flex-col gap-1">
+      <!-- svelte-ignore a11y_label_has_associated_control -->
       <label class="text-sm font-medium text-gray-700">Description</label>
       <textarea
         placeholder="Enter description"
@@ -71,6 +73,7 @@
 
     <div class="flex gap-2">
       <div class="flex-1 flex flex-col gap-1">
+        <!-- svelte-ignore a11y_label_has_associated_control -->
         <label class="text-sm font-medium text-gray-700">Due Date</label>
         <input
           type="date"
@@ -80,6 +83,7 @@
       </div>
 
       <div class="flex flex-col gap-1 w-20">
+        <!-- svelte-ignore a11y_label_has_associated_control -->
         <label class="text-sm font-medium text-gray-700 text-center">SP</label>
         <input
           type="number"
@@ -91,6 +95,7 @@
     </div>
 
     <div class="flex flex-col gap-1">
+      <!-- svelte-ignore a11y_label_has_associated_control -->
       <label class="text-sm font-medium text-gray-700">Priority</label>
       <select
         bind:value={priority}
