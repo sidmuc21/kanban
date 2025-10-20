@@ -47,7 +47,7 @@
       const [moved] = b[fromLane].splice(idx, 1);
       b[toLane].push(moved);
 
-      // Simple notification for completed issue
+      // Notification for done
       if (toLane === "Done" && "Notification" in window) {
         if (Notification.permission === "granted") {
           new Notification(`Issue "${moved.title}" completed ✅`);
@@ -75,6 +75,7 @@
 
     <div class="flex gap-3 flex-wrap justify-center sm:justify-start">
       <button
+        aria-label="Export all issues as CSV"
         class={`px-4 py-2 rounded-xl shadow font-semibold transition ${$dark ? 'bg-indigo-600 text-white hover:bg-indigo-500' : 'bg-indigo-700 text-white hover:bg-indigo-600'}`}
         on:click={handleExportCSV}
       >
@@ -82,6 +83,7 @@
       </button>
 
       <button
+        aria-label="Add a new issue"
         class={`px-4 py-2 rounded-xl shadow font-semibold transition ${$dark ? 'bg-indigo-800 text-white hover:bg-indigo-700' : 'bg-indigo-900 text-white hover:bg-indigo-800'}`}
         on:click={() => (modalOpen = true)}
       >
@@ -89,6 +91,7 @@
       </button>
 
       <button
+        aria-label="Undo last action"
         class={`px-4 py-2 rounded-xl shadow font-semibold transition ${$dark ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' : 'bg-gray-300 text-gray-800 hover:bg-gray-400'}`}
         on:click={undo}
       >
@@ -96,6 +99,7 @@
       </button>
 
       <button
+        aria-label="Redo last undone action"
         class={`px-4 py-2 rounded-xl shadow font-semibold transition ${$dark ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' : 'bg-gray-300 text-gray-800 hover:bg-gray-400'}`}
         on:click={redo}
       >
@@ -103,6 +107,8 @@
       </button>
 
       <button
+        aria-label="Toggle background color"
+        aria-pressed={$dark}
         class={`px-4 py-2 rounded-xl shadow font-semibold transition ${$dark ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' : 'bg-gray-300 text-gray-800 hover:bg-gray-400'}`}
         on:click={() => dark.update((d) => !d)}
       >
@@ -114,15 +120,17 @@
   <!-- Board -->
   <main class="flex-1 p-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
     {#each lanes as lane}
+      <!-- svelte-ignore a11y_no_redundant_roles -->
       <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
       <section
+        role="region"
+        aria-labelledby={`lane-${lane}`}
         class={`flex flex-col rounded-2xl shadow-md hover:shadow-xl transition-shadow overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500 ${$dark ? 'bg-gray-800 text-gray-100' : (lane === 'Archive' ? 'bg-yellow-50' : 'bg-white')}`}
         on:drop={(e) => handleDrop(e, lane)}
         on:dragover={handleDragOver}
         tabindex="0"
-        aria-label="{lane} lane, {$storyPointsSum[lane] ?? 0} story points"
       >
-        <header class={`text-center py-3 font-semibold border-b transition-colors ${$dark ? 'border-gray-700' : 'border-indigo-200'}`}>
+        <header id={`lane-${lane}`} class={`text-center py-3 font-semibold border-b transition-colors ${$dark ? 'border-gray-700' : 'border-indigo-200'}`}>
           {lane} ({$storyPointsSum[lane] ?? 0} SP)
         </header>
         <div class="p-4 space-y-4 min-h-[140px]">
