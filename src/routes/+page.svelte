@@ -68,7 +68,7 @@
   const redo = () => board.redo?.();
 </script>
 
-<div class={`flex flex-col min-h-screen transition-colors duration-300 ${$dark ? 'bg-gray-900 text-gray-100' : 'bg-indigo-100 text-gray-900'}`}>
+<div class={`flex flex-col min-h-screen transition-colors duration-300 ${$dark ? 'bg-gray-900 text-gray-100' : 'bg-indigo-100 text-gray-800'}`}>
   <!-- Header -->
   <header class={`flex flex-col sm:flex-row justify-between items-center p-6 rounded-b-2xl shadow-md transition-colors duration-300 ${$dark ? 'bg-gray-800' : 'bg-indigo-50'}`}>
     <h1 class="text-4xl font-lex font-bold mb-4 sm:mb-0">Kanban Board</h1>
