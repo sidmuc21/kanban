@@ -9,7 +9,7 @@
   let storyPoints = 1;
   let priority: "Low" | "Medium" | "High" = "Medium";
 
-  const generateId = () => Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+  const generateId = () => Date.now().toString(36) + Math.random().toString(36).substr(2,5);
 
   $: if (dialogEl) {
     if (open && !dialogEl.open) dialogEl.showModal();
@@ -18,7 +18,6 @@
 
   const addIssue = () => {
     if (!title) return;
-
     board.update(b => {
       b["To Do"].push({
         id: generateId(),
@@ -31,7 +30,6 @@
       });
       return b;
     });
-
     title = description = "";
     dueDate = "";
     storyPoints = 1;
@@ -39,89 +37,44 @@
     open = false;
   };
 
-  const handleClose = () => (open = false);
+  const handleClose = () => open = false;
+
+  const handleKeydown = (e: KeyboardEvent) => {
+    if(e.key === "Escape") handleClose();
+  };
 </script>
 
-<dialog
-  bind:this={dialogEl}
-  class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-8 rounded-3xl w-[400px] max-w-[90vw] font-lex shadow-2xl bg-white"
->
+<dialog bind:this={dialogEl} class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-8 rounded-3xl w-[400px] max-w-[90vw] font-lex shadow-2xl bg-white dark:bg-gray-800" on:keydown={handleKeydown} aria-modal="true">
   <form method="dialog" class="flex flex-col gap-4">
-    <h3 class="text-2xl font-semibold text-indigo-900">Create New Issue</h3>
+    <h3 class="text-2xl font-semibold text-indigo-900 dark:text-white">Create New Issue</h3>
 
-    <div class="flex flex-col gap-1">
-      <!-- svelte-ignore a11y_label_has_associated_control -->
-      <label class="text-sm font-medium text-gray-700">Title</label>
-      <input
-        type="text"
-        placeholder="Enter title"
-        bind:value={title}
-        required
-        class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-      />
-    </div>
+    <label for="title" class="text-sm font-medium text-gray-700 dark:text-gray-300">Title</label>
+    <input id="title" type="text" bind:value={title} placeholder="Enter title" required class="border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"/>
 
-    <div class="flex flex-col gap-1">
-      <!-- svelte-ignore a11y_label_has_associated_control -->
-      <label class="text-sm font-medium text-gray-700">Description</label>
-      <textarea
-        placeholder="Enter description"
-        bind:value={description}
-        class="border border-gray-300 rounded-lg p-2 h-24 resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500"
-      ></textarea>
-    </div>
+    <label for="description" class="text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+    <textarea id="description" bind:value={description} placeholder="Enter description" class="border p-2 rounded-lg h-24 resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"></textarea>
 
     <div class="flex gap-2">
       <div class="flex-1 flex flex-col gap-1">
-        <!-- svelte-ignore a11y_label_has_associated_control -->
-        <label class="text-sm font-medium text-gray-700">Due Date</label>
-        <input
-          type="date"
-          bind:value={dueDate}
-          class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        />
+        <label for="due" class="text-sm font-medium text-gray-700 dark:text-gray-300">Due Date</label>
+        <input id="due" type="date" bind:value={dueDate} class="border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"/>
       </div>
-
       <div class="flex flex-col gap-1 w-20">
-        <!-- svelte-ignore a11y_label_has_associated_control -->
-        <label class="text-sm font-medium text-gray-700 text-center">SP</label>
-        <input
-          type="number"
-          min="1"
-          bind:value={storyPoints}
-          class="border border-gray-300 rounded-lg p-2 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        />
+        <label for="sp" class="text-sm font-medium text-gray-700 dark:text-gray-300 text-center">SP</label>
+        <input id="sp" type="number" min="1" bind:value={storyPoints} class="border p-2 rounded-lg text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"/>
       </div>
     </div>
 
-    <div class="flex flex-col gap-1">
-      <!-- svelte-ignore a11y_label_has_associated_control -->
-      <label class="text-sm font-medium text-gray-700">Priority</label>
-      <select
-        bind:value={priority}
-        class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-      >
-        <option>Low</option>
-        <option selected>Medium</option>
-        <option>High</option>
-      </select>
-    </div>
+    <label for="priority" class="text-sm font-medium text-gray-700 dark:text-gray-300">Priority</label>
+    <select id="priority" bind:value={priority} class="border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+      <option>Low</option>
+      <option selected>Medium</option>
+      <option>High</option>
+    </select>
 
     <div class="flex justify-end gap-3 mt-4">
-      <button
-        type="button"
-        on:click={handleClose}
-        class="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition"
-      >
-        Cancel
-      </button>
-      <button
-        type="button"
-        on:click={addIssue}
-        class="px-4 py-2 rounded-lg bg-indigo-700 text-white hover:bg-indigo-800 transition"
-      >
-        Add Issue
-      </button>
+      <button type="button" on:click={handleClose} class="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700 transition">Cancel</button>
+      <button type="button" on:click={addIssue} class="px-4 py-2 rounded-lg bg-indigo-700 text-white hover:bg-indigo-800 dark:bg-indigo-600 dark:hover:bg-indigo-500 transition">Add Issue</button>
     </div>
   </form>
 </dialog>
