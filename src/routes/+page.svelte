@@ -79,7 +79,7 @@
         class={`px-4 py-2 rounded-xl shadow font-semibold transition ${$dark ? 'bg-indigo-600 text-white hover:bg-indigo-500' : 'bg-indigo-700 text-white hover:bg-indigo-600'}`}
         on:click={handleExportCSV}
       >
-        ⬇ Export CSV
+         Export CSV
       </button>
 
       <button
@@ -95,7 +95,7 @@
         class={`px-4 py-2 rounded-xl shadow font-semibold transition ${$dark ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' : 'bg-gray-300 text-gray-800 hover:bg-gray-400'}`}
         on:click={undo}
       >
-        ⬅ Undo
+         Undo
       </button>
 
       <button
@@ -103,7 +103,7 @@
         class={`px-4 py-2 rounded-xl shadow font-semibold transition ${$dark ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' : 'bg-gray-300 text-gray-800 hover:bg-gray-400'}`}
         on:click={redo}
       >
-        ➡ Redo
+        Redo
       </button>
 
       <button
@@ -148,7 +148,7 @@
 
   <!-- Footer -->
   <footer class={`p-4 text-center text-sm border-t transition-colors ${$dark ? 'bg-gray-800 border-gray-700 text-gray-300' : 'bg-indigo-50 border-indigo-200 text-gray-600'}`}>
-    🌍 Your country: <span class="font-semibold">{userCountry}</span>
+    Your country: <span class="font-semibold">{userCountry}</span>
   </footer>
 </div>
 
